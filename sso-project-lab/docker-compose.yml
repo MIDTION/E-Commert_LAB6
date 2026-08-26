@@ -1,66 +1,69 @@
 version: '3.8'
+
 services:
- # ----------------------------------------------------
- # 1. RADIUS Server (FreeRADIUS)
- # ----------------------------------------------------
- freeradius:
- image: freeradius/freeradius-server:latest
- container_name: sso_radius
- ports:
- - "1812:1812/udp"
- environment:
- # จำลอง Client (Network ที่อนุญาต) และ Shared Secret
- - RAD_CLIENTS=172.16.0.0/12@testing123
- # จำลองข้อมูลนักศึกษาสำหรับทดสอบเข้าสู่ระบบ (username@password)
- - RAD_USERS=student66000001@password1234
- networks:
- - kmitl_sso_net
- # ----------------------------------------------------
- # 2. Central Auth Service (SSO API)
- # ----------------------------------------------------
- central-auth:
- build: ./central-auth
- container_name: sso_central_auth
- environment:
- - PORT=3000
- - RADIUS_HOST=freeradius # อ้างอิงชื่อ Container ได้เลย (DNS อัตโนมัติ)
- - RADIUS_SECRET=testing123
- - JWT_SECRET=kmitl_chumphon_sso_secret_key
- networks:
- - kmitl_sso_net
- depends_on:
- - freeradius
- restart: unless-stopped
- # ----------------------------------------------------
- # 3. Web Application 1 (เช่น ระบบจองห้องแล็บ)
- # ----------------------------------------------------
- web-app-1:
- build: ./web-app-1
- container_name: sso_web_app_1
- environment:
- - PORT=4000
- - JWT_SECRET=kmitl_chumphon_sso_secret_key
- networks:
- - kmitl_sso_net
- restart: unless-stopped
- # ----------------------------------------------------
- # 4. Nginx (Reverse Proxy & Load Balancer)
- # ---------------------------------------------------- 
- nginx:
- image: nginx:alpine
- container_name: sso_nginx_proxy
- ports:
- - "80:80" # นักศึกษาเข้าใช้งานผ่านพอร์ต 80 ของ localhost
- volumes:
- - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
- depends_on:
- - central-auth
- - web-app-1
- networks:
- - kmitl_sso_net
+  # ----------------------------------------------------
+  # 1. RADIUS Server (FreeRADIUS)
+  # ----------------------------------------------------
+  freeradius:
+    image: freeradius/freeradius-server:latest
+    container_name: sso_radius
+    ports:
+      - "1812:1812/udp"
+    environment:
+      # จำลอง Client (Network ที่อนุญาต) และ Shared Secret
+      - RAD_CLIENTS=172.16.0.0/12@testing123
+      # จำลองข้อมูลนักศึกษาสำหรับทดสอบเข้าสู่ระบบ (username@password)
+      - RAD_USERS=student66000001@password1234
+    networks:
+      - kmitl_sso_net
+
+  # ----------------------------------------------------
+  # 2. Central Auth Service (SSO API)
+  # ----------------------------------------------------
+  central-auth:
+    build: ./central-auth
+    container_name: sso_central_auth
+    environment:
+      - PORT=3000
+      - RADIUS_HOST=freeradius # อ้างอิงชื่อ Container ได้เลย (DNS อัตโนมัติ)
+      - RADIUS_SECRET=testing123
+      - JWT_SECRET=kmitl_chumphon_sso_secret_key
+    networks:
+      - kmitl_sso_net
+    depends_on:
+      - freeradius
+    restart: unless-stopped
+
+  # ----------------------------------------------------
+  # 3. Web Application 1 (เช่น ระบบจองห้องแล็บ)
+  # ----------------------------------------------------
+  web-app-1:
+    build: ./web-app-1
+    container_name: sso_web_app_1
+    environment:
+      - PORT=4000
+      - JWT_SECRET=kmitl_chumphon_sso_secret_key
+    networks:
+      - kmitl_sso_net
+    restart: unless-stopped
+
+  # ----------------------------------------------------
+  # 4. Nginx (Reverse Proxy & Load Balancer)
+  # ---------------------------------------------------- 
+  nginx:
+    image: nginx:alpine
+    container_name: sso_nginx_proxy
+    ports:
+      - "80:80" # นักศึกษาเข้าใช้งานผ่านพอร์ต 80 ของ localhost
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - central-auth
+      - web-app-1
+    networks:
+      - kmitl_sso_net
+
 # กำหนด Network ภายในเพื่อให้ Container คุยกันเองได้
 networks:
- kmitl_sso_net:
- driver: bridge
-```
----
+  kmitl_sso_net:
+    driver: bridge
