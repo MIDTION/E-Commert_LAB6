@@ -1,0 +1,53 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ข้อมูล User ตัด password ทิ้ง เพื่อให้เชื่อมกับ RADIUS (SSO)
+model User {
+  id             Int             @id @default(autoincrement())
+  username       String          @unique // ต้องตรงกับ RADIUS
+  credit_balance Decimal         @default(0.00) @db.Decimal(10, 2)
+  created_at     DateTime        @default(now())
+  
+  orders         Order[]
+  inventory      UserInventory[]
+}
+
+model Product {
+  id           Int             @id @default(autoincrement())
+  name         String
+  description  String?         @db.Text
+  price        Decimal         @db.Decimal(10, 2)
+  game_type    String?
+  stock_status String          @default("available") // available, sold_out
+  created_at   DateTime        @default(now())
+  
+  inventory    UserInventory[]
+}
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  total_amount Decimal  @db.Decimal(10, 2)
+  status       String   @default("pending") // pending, completed, failed
+  created_at   DateTime @default(now())
+  
+  user         User     @relation(fields: [user_id], references: [id])
+}
+
+model UserInventory {
+  id               Int      @id @default(autoincrement())
+  user_id          Int
+  product_id       Int
+  account_username String?
+  account_password String?
+  acquired_at      DateTime @default(now())
+  
+  user             User     @relation(fields: [user_id], references: [id])
+  product          Product  @relation(fields: [product_id], references: [id])
+}
