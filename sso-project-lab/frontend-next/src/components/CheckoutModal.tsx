@@ -1,0 +1,133 @@
+import { useState } from 'react';
+import { X, ShieldCheck, CreditCard, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  game: string;
+  image: string;
+}
+
+interface CheckoutModalProps {
+  product: Product;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function CheckoutModal({ product, isOpen, onClose }: CheckoutModalProps) {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const router = useRouter();
+
+  if (!isOpen) return null;
+
+  const handlePurchase = () => {
+    setIsProcessing(true);
+    
+    // Simulate API call to /api/shop/orders
+    setTimeout(() => {
+      setIsProcessing(false);
+      setIsSuccess(true);
+      
+      // Close and redirect to inventory after a short delay
+      setTimeout(() => {
+        onClose();
+        router.push('/inventory');
+      }, 2000);
+    }, 1500);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        onClick={!isProcessing ? onClose : undefined}
+      ></div>
+      
+      {/* Modal */}
+      <div className="relative bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-800">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-indigo-400" />
+            Checkout Confirmation
+          </h2>
+          <button 
+            onClick={onClose}
+            disabled={isProcessing || isSuccess}
+            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {!isSuccess ? (
+            <>
+              <div className="flex gap-4 mb-6 bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50">
+                <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0">
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <div className="text-xs text-indigo-400 font-semibold mb-1">{product.game}</div>
+                  <div className="font-medium text-slate-200 leading-tight">{product.name}</div>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-8">
+                <div className="flex justify-between text-slate-400">
+                  <span>Price</span>
+                  <span className="text-slate-200">{product.price.toLocaleString()} ฿</span>
+                </div>
+                <div className="flex justify-between text-slate-400">
+                  <span>Fee</span>
+                  <span className="text-slate-200">0 ฿</span>
+                </div>
+                <div className="h-px w-full bg-slate-800 my-2"></div>
+                <div className="flex justify-between font-bold text-lg">
+                  <span className="text-white">Total</span>
+                  <span className="text-emerald-400">{product.price.toLocaleString()} ฿</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-indigo-500/10 text-indigo-300 p-4 rounded-xl border border-indigo-500/20 text-sm mb-6">
+                <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5" />
+                <p>Your transaction is secure and the game account details will be delivered instantly to your inventory.</p>
+              </div>
+
+              <button
+                onClick={handlePurchase}
+                disabled={isProcessing}
+                className="w-full relative overflow-hidden bg-indigo-600 hover:bg-indigo-500 text-white py-3.5 rounded-xl font-bold transition-all duration-200 shadow-lg shadow-indigo-600/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processing Payment...
+                  </>
+                ) : (
+                  'Confirm Purchase'
+                )}
+              </button>
+            </>
+          ) : (
+            <div className="py-10 flex flex-col items-center justify-center text-center animate-in zoom-in-95 duration-300">
+              <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6">
+                <ShieldCheck className="w-10 h-10" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Payment Successful!</h3>
+              <p className="text-slate-400">
+                Your game account is ready. Redirecting to your inventory...
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
