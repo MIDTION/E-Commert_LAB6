@@ -1,0 +1,13 @@
+# บังคับให้ทุกคนได้ไฟล์แบบ LF ไม่ว่าจะใช้ OS อะไร
+* text=auto eol=lf
+
+# ไฟล์ของ Windows โดยเฉพาะ ให้คง CRLF ไว้
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# ไฟล์ไบนารี ห้าม git แตะต้อง
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.ico  binary
