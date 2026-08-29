@@ -1,0 +1,15 @@
+# format:  <username>  Cleartext-Password := "<password>"
+#          the next line must be indented = attribute returned on Accept
+
+student66000001  Cleartext-Password := "password1234"
+                 Reply-Message = "Welcome KMITL SSO"
+
+student66000002  Cleartext-Password := "password5678"
+                 Reply-Message = "Welcome KMITL SSO"
+
+admin            Cleartext-Password := "admin1234"
+                 Reply-Message = "Administrator"
+
+# do not remove the line below: standard fallback, anyone not matching above is rejected here
+DEFAULT  Auth-Type := Reject
+         Reply-Message = "Login incorrect"
