@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/layout/Sidebar";
 
 export default function ProtectedLayout({
   children,
@@ -6,10 +6,12 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col relative pt-24">
-      <Navbar />
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
-        {children}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row transition-colors duration-300">
+      <Sidebar />
+      <main className="flex-1 w-full max-w-full overflow-x-hidden pt-16 lg:pt-0">
+        <div className="p-6 md:p-8 max-w-[1600px] mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

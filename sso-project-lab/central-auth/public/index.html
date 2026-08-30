@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSO Login | E-Commerce Portal</title>
+  <link rel="stylesheet" href="/auth/style.css">
+  <!-- Note: We use /auth/style.css because Nginx proxies /auth/ to this service -->
+</head>
+<body>
+  
+  <div class="background-container">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <main class="login-container">
+    <div class="login-card">
+      <div class="logo-container">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+      
+      <h1 class="title">Central Authentication</h1>
+      <p class="subtitle">Log in with your organizational account to access the E-Commerce Portal.</p>
+
+      <div id="error-message" class="alert hidden">
+        <span id="error-text">Invalid username or password</span>
+      </div>
+
+      <form id="login-form">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="submit-btn" class="submit-btn">
+          <span id="btn-text">Sign In</span>
+          <div id="btn-loader" class="loader hidden"></div>
+        </button>
+      </form>
+
+      <div class="footer">
+        Secured by KMITL Central SSO
+      </div>
+    </div>
+  </main>
+
+  <script src="/auth/script.js"></script>
+</body>
+</html>
