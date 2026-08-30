@@ -1,98 +1,173 @@
-# แผนการพัฒนา Backend (Python) สำหรับระบบ E-Commerce (SSO Project)
+# คู่มือและสถาปัตยกรรมระบบ Backend (FastAPI + MySQL + Docker)
 
-เอกสารนี้อธิบายกระบวนการและขั้นตอนทั้งหมดในการพัฒนา Backend ด้วย Python โดยแบ่งออกเป็นระยะ (Phases) อย่างชัดเจน ตั้งแต่การวางโครงสร้างไปจนถึงการสร้าง API และการทดสอบ
+เอกสารนี้อธิบายการทำงานของระบบหลังบ้าน (Backend) สำหรับโปรเจกต์ E-Commerce & SSO Lab ซึ่งสอดคล้องกับเทคโนโลยีและโครงสร้างที่พัฒนาขึ้นจริง โดยครอบคลุมตั้งแต่การออกแบบไปจนถึงวิธีการนำ API ไปเชื่อมต่อกับ Frontend
 
-## ระยะที่ 1: การตั้งค่าโปรเจกต์และโครงสร้างพื้นฐาน (Project Setup & Architecture)
+---
 
-1. **เลือก Framework:** แนะนำให้ใช้ **FastAPI** (เนื่องจากมีประสิทธิภาพสูง, รองรับ Asynchronous, และสร้าง API Docs (Swagger/ReDoc) ให้อัตโนมัติ) หรือ **Flask/Django** ขึ้นอยู่กับความคุ้นเคย
-2. **การจัดการ Environment:**
-   - สร้าง Virtual Environment: `python -m venv venv`
-   - สร้างไฟล์ `requirements.txt` สำหรับจัดการ dependencies (เช่น `fastapi`, `uvicorn`, `sqlalchemy`, `pydantic`, `python-jose`, `passlib`)
-3. **กำหนดโครงสร้างโปรเจกต์ (Folder Structure):**
-   ```text
-   backend-python/
-   ├── app/
-   │   ├── __init__.py
-   │   ├── main.py          # จุดเริ่มต้นของแอปพลิเคชัน (Entry point)
-   │   ├── api/             # Routers/Endpoints ของ API
-   │   │   ├── endpoints/
-   │   │   └── dependencies.py # Dependency injection (เช่น การเช็ค token)
-   │   ├── core/            # การตั้งค่าแอปพลิเคชัน (Config, Security)
-   │   │   ├── config.py    # อ่านค่าจาก .env
-   │   │   └── security.py  # ฟังก์ชันเข้ารหัส/ถอดรหัส, JWT
-   │   ├── models/          # SQLAlchemy Models (โครงสร้าง Database)
-   │   ├── schemas/         # Pydantic Models (สำหรับ Validate ข้อมูล In/Out)
-   │   ├── crud/            # ฟังก์ชันจัดการ Database (Create, Read, Update, Delete)
-   │   └── services/        # Business logic ที่ซับซ้อน
-   ├── .env                 # ไฟล์เก็บค่าตัวแปรสภาพแวดล้อม (ห้าม push ลง Git)
-   ├── .gitignore
-   └── requirements.txt
-   ```
+## 1. ภาพรวมและเทคโนโลยีที่ใช้ (Tech Stack & Overview)
+ระบบถูกออกแบบมาให้ทำงานในคอนเทนเนอร์ (Dockerized) เพื่อความสะดวกในการติดตั้งและทดสอบ
+- **Framework หลัก:** `FastAPI` (Python) ทำงานแบบ Asynchronous รวดเร็ว และสร้างเอกสาร API ให้อัตโนมัติ
+- **Database:** `MySQL 8.0` รันผ่าน Docker 
+- **ORM:** `SQLAlchemy` สำหรับเชื่อมต่อและจัดการฐานข้อมูล
+- **Data Validation:** `Pydantic` สำหรับตรวจสอบความถูกต้องของข้อมูล (Schemas)
+- **Deployment:** `Docker` และ `Docker Compose`
 
-## ระยะที่ 2: การออกแบบฐานข้อมูล (Database Design & ORM)
+### โครงสร้างโปรเจกต์ (Folder Structure)
+- `app/models/`: กำหนดโครงสร้างตารางในฐานข้อมูล (SQLAlchemy Models)
+- `app/schemas/`: กำหนดรูปแบบข้อมูลเข้า/ออกของ API (Pydantic Models)
+- `app/crud/`: รวมฟังก์ชันคำสั่งดึง/เพิ่ม/แก้ไข/ลบ ข้อมูลใน Database (Create, Read, Update, Delete)
+- `app/api/endpoints/`: ตัวรับ Request จากผู้ใช้ (Routers) สำหรับระบบต่างๆ เช่น Auth, Users, Products, Orders
+- `app/core/`: ตั้งค่าระบบและ Security เช่น ไฟล์อ่าน `.env` และการสร้าง JWT Token
+- `app/main.py`: จุดเริ่มต้นของแอปพลิเคชัน ตั้งค่า CORS และเชื่อม API ทั้งหมดเข้าด้วยกัน
+- `docker-compose.yml` & `Dockerfile`: กำหนดการทำงานของเซิร์ฟเวอร์และฐานข้อมูล
 
-1. **เลือก Database:** PostgreSQL หรือ MySQL สำหรับ Relational Database หรือ MongoDB สำหรับ NoSQL
-2. **เชื่อมต่อฐานข้อมูล:** ใช้เครื่องมือเช่น **SQLAlchemy** (ORM) ในการจัดการและเชื่อมต่อ
-3. **ออกแบบตาราง (Tables) เบื้องต้น:**
-   - `Users`: เก็บข้อมูลผู้ใช้ (id, username, email, password_hash, role)
-   - `Products`: เก็บข้อมูลสินค้า (id, name, description, price, stock)
-   - `Orders`: เก็บข้อมูลคำสั่งซื้อ (id, user_id, status, total_price)
-   - `Order_Items`: รายละเอียดสินค้าในคำสั่งซื้อ (order_id, product_id, quantity, price)
-4. **ทำ Database Migration:** ใช้ **Alembic** ควบคู่กับ SQLAlchemy เพื่อจัดการเวอร์ชันของ Schema ฐานข้อมูล
+### วิธีสตาร์ทระบบ (How to run Backend & Database)
+เพื่อให้ระบบหลังบ้านและฐานข้อมูล (MySQL) พร้อมทำงานสำหรับเชื่อมต่อกับหน้าบ้าน (Frontend) ให้รันคำสั่งต่อไปนี้ใน Terminal (ต้องอยู่ในโฟลเดอร์ `backend-python`):
 
-## ระยะที่ 3: ระบบการยืนยันตัวตน (Authentication & SSO Integration)
+```bash
+# คำสั่งสตาร์ทระบบ (รัน Backend และ Database ไว้เบื้องหลัง)
+docker-compose up -d --build
+```
 
-1. **การทำ Local Authentication:**
-   - สร้าง API สำหรับ Register และ Login
-   - ใช้ `passlib` ในการ Hash รหัสผ่าน
-   - สร้างและตรวจสอบ JWT Token (`python-jose`)
-2. **การบูรณาการระบบ Single Sign-On (SSO):**
-   - ศึกษาและกำหนดโปรโตคอลที่จะใช้ (เช่น OAuth2.0, OpenID Connect)
-   - สร้าง Endpoint สำหรับ Redirect ไปยัง SSO Provider (Identity Provider - IdP)
-   - สร้าง Endpoint สำหรับรับ Callback จาก IdP
-   - ตรวจสอบ Token/Authorization Code จาก IdP และออก JWT Token ของระบบเราให้กับผู้ใช้งาน
-3. **การจัดการสิทธิ์ (Authorization / Role-Based Access Control):**
-   - ตรวจสอบ Role (เช่น Admin, Customer) ก่อนอนุญาตให้เข้าถึง API บางเส้นทาง
+หลังจากรันคำสั่งนี้:
+- **Backend API** จะเปิดทำงานที่ `http://localhost:8000`
+- **คู่มือ API (Swagger UI)** สามารถเข้าดูและทดสอบได้ที่ `http://localhost:8000/docs`
+- **Database MySQL** จะเปิดใช้งานที่ Port `3307` ของเครื่อง (เผื่อให้โปรแกรมจัดการ DB เข้าถึงได้)
 
-## ระยะที่ 4: การพัฒนา API (API Development & Business Logic)
+*(หากต้องการปิดการทำงานของระบบทั้งหมด ให้ใช้คำสั่ง `docker-compose down`)*
 
-การพัฒนา API ให้สอดคล้องกับหลักการ RESTful:
+### Workflow การทำงานของระบบ (System Workflow)
 
-1. **User Management API:**
-   - `GET /api/users/me` - ดูข้อมูลส่วนตัว (ต้องมี Token)
-   - `PUT /api/users/me` - แก้ไขข้อมูลส่วนตัว
-2. **Product API:**
-   - `GET /api/products` - ดูรายการสินค้าทั้งหมด (เปิดสาธารณะ)
-   - `GET /api/products/{id}` - ดูรายละเอียดสินค้า
-   - `POST /api/products` - เพิ่มสินค้า (เฉพาะ Admin)
-   - `PUT /api/products/{id}` - แก้ไขสินค้า (เฉพาะ Admin)
-   - `DELETE /api/products/{id}` - ลบสินค้า (เฉพาะ Admin)
-3. **Order & Checkout API:**
-   - `POST /api/orders` - สร้างคำสั่งซื้อใหม่ (ต้องมี Token)
-   - `GET /api/orders/my-orders` - ดูประวัติการสั่งซื้อของตัวเอง
-   - `PUT /api/orders/{id}/status` - อัปเดตสถานะคำสั่งซื้อ (เฉพาะ Admin)
+```mermaid
+sequenceDiagram
+    participant Client as Frontend (React/Vue/Postman)
+    participant Auth as Auth API (/api/auth)
+    participant User as User API (/api/users)
+    participant Product as Product API (/api/products)
+    participant Order as Order API (/api/orders)
+    participant DB as MySQL Database
 
-*หมายเหตุ: ทุก API ควรมีการตรวจสอบข้อมูล (Data Validation) ผ่าน `schemas` (Pydantic)*
+    %% Authentication Flow
+    rect rgb(240, 248, 255)
+    Note over Client, DB: 1. ระบบยืนยันตัวตน (Authentication)
+    Client->>Auth: POST /register (สมัครสมาชิก)
+    Auth->>DB: บันทึกข้อมูล & Hash รหัสผ่าน
+    DB-->>Auth: สำเร็จ
+    Auth-->>Client: สร้างบัญชีสำเร็จ
 
-## ระยะที่ 5: ความปลอดภัย, การทดสอบ และปรับปรุง (Security, Testing & Optimization)
+    Client->>Auth: POST /login (เข้าสู่ระบบ)
+    Auth->>DB: ตรวจสอบข้อมูลผู้ใช้
+    DB-->>Auth: ถูกต้อง
+    Auth-->>Client: ส่งกลับ JWT Access Token
+    end
 
-1. **ความปลอดภัย (Security):**
-   - ตรวจสอบช่องโหว่พื้นฐาน (SQL Injection ป้องกันโดยใช้ ORM แล้ว, XSS)
-   - ตั้งค่า CORS (Cross-Origin Resource Sharing) ให้ถูกต้องเพื่อให้ Frontend เรียกใช้งานได้
-   - Rate Limiting เพื่อป้องกันการถูกโจมตี (DDoS/Brute Force)
-2. **การทดสอบ (Testing):**
-   - เขียน Unit Test ด้วย `pytest`
-   - ทดสอบ API Endpoints โดยใช้ `TestClient` ของ FastAPI
-3. **การจัดการข้อผิดพลาด (Error Handling):**
-   - สร้าง Exception Handlers เพื่อส่งคืน HTTP Status Codes และข้อความที่ชัดเจน (เช่น 400 Bad Request, 401 Unauthorized, 404 Not Found)
-4. **Logging & Monitoring:**
-   - เพิ่มระบบ Logging เพื่อบันทึกการทำงานและ Error ต่างๆ ที่เกิดขึ้น
+    %% Public Data
+    rect rgb(240, 255, 240)
+    Note over Client, DB: 2. การเข้าถึงข้อมูลทั่วไป (Public API)
+    Client->>Product: GET /products/ (ดูสินค้า)
+    Product->>DB: ดึงข้อมูลสินค้า
+    DB-->>Product: รายการสินค้า
+    Product-->>Client: ส่งกลับ JSON รายการสินค้า
+    end
 
-## สรุปขั้นตอนการเริ่มลงมือทำงาน
+    %% Protected Data
+    rect rgb(255, 240, 240)
+    Note over Client, DB: 3. การเข้าถึงข้อมูลที่ต้องใช้สิทธิ์ (Protected API - ต้องใช้ Token)
+    Client->>User: GET /users/me (ส่ง Header: Bearer Token)
+    User->>User: ตรวจสอบ JWT Token
+    User->>DB: ดึงข้อมูลโปรไฟล์
+    DB-->>User: ข้อมูลผู้ใช้
+    User-->>Client: ส่งกลับข้อมูลโปรไฟล์
 
-1. สร้าง Folder และ Virtual Environment
-2. สร้างไฟล์ `main.py` พิมพ์โค้ด Hello World เบื้องต้น และทดลองรัน (เช่น `uvicorn app.main:app --reload`)
-3. ต่อ Database และกำหนด Models
-4. ทำระบบ Login/SSO ให้เสร็จเป็นอย่างแรก (เพราะ API อื่นๆ มักจะต้องใช้ User)
-5. ค่อยๆ พัฒนา CRUD API สำหรับ Products และ Orders
-6. เขียน Test และเตรียม Deploy
+    Client->>Order: POST /orders/ (ส่ง Header: Bearer Token, รายการสินค้า)
+    Order->>Order: ตรวจสอบ JWT Token
+    Order->>DB: ตรวจสอบสต๊อก & คำนวณราคา & บันทึก
+    DB-->>Order: สำเร็จ
+    Order-->>Client: ยืนยันการสั่งซื้อ
+    end
+```
+
+---
+
+## 2. การออกแบบฐานข้อมูล (Database Schema)
+ฐานข้อมูลชื่อ `ecom_db` ประกอบด้วยตารางหลักดังนี้:
+1. **users:** เก็บข้อมูลบัญชีผู้ใช้ (`id`, `username`, `email`, `password_hash`, `role` (admin/customer))
+2. **products:** เก็บข้อมูลสินค้า (`id`, `name`, `description`, `price`, `stock`)
+3. **orders:** เก็บข้อมูลใบสั่งซื้อ (`id`, `user_id`, `status`, `total_price`)
+4. **order_items:** เก็บรายละเอียดสินค้าในใบสั่งซื้อ (`id`, `order_id`, `product_id`, `quantity`, `price`)
+
+---
+
+## 3. ระบบยืนยันตัวตนและความปลอดภัย (Authentication & Security)
+- **Password Hashing:** รหัสผ่านผู้ใช้ทั้งหมดจะถูกเข้ารหัสผ่านด้วยอัลกอริทึม `bcrypt` ก่อนบันทึกลง Database
+- **JWT (JSON Web Token):** เมื่อล็อกอินสำเร็จ ระบบจะคืนค่า Access Token ให้ Token นี้ใช้เป็นกุญแจผ่านทางสำหรับการเรียก API เส้นอื่นๆ
+- **Role-Based Access Control:** มีการจำกัดสิทธิ์ในบาง API เช่น การเพิ่ม/ลบสินค้า หรือแก้ไขสถานะคำสั่งซื้อ จะต้องล็อกอินด้วยผู้ใช้ที่มี Role เป็น `admin` เท่านั้น
+
+---
+
+## 4. สรุป API Endpoints หลัก
+- **Authentication:** 
+  - `POST /api/auth/register` (สมัครสมาชิก)
+  - `POST /api/auth/login` (เข้าสู่ระบบ เพื่อรับ Token)
+- **Users:** 
+  - `GET /api/users/me` (ดูโปรไฟล์ตัวเอง - ต้องใช้ Token)
+- **Products:** 
+  - `GET /api/products/` (ดูสินค้าทั้งหมด)
+  - `POST /api/products/` (เพิ่มสินค้า - เฉพาะ Admin)
+- **Orders:** 
+  - `POST /api/orders/` (สร้างคำสั่งซื้อ จะมีการคำนวณราคาและตัดสต๊อกให้อัตโนมัติ - ต้องใช้ Token)
+  - `GET /api/orders/my-orders` (ดูประวัติการสั่งซื้อของตนเอง)
+
+---
+
+## 5. การทดสอบระบบด้วย Postman (และ Swagger UI)
+ด้วยความสามารถของ FastAPI ทำให้ระบบสร้างหน้า API Docs (Swagger UI) ให้ทดสอบได้ทันทีที่ `http://localhost:8000/docs`
+
+**หากต้องการทดสอบด้วย Postman อย่างเต็มรูปแบบ:**
+1. **Import API เข้า Postman อัตโนมัติ:**
+   - เปิด Postman กดปุ่ม **Import**
+   - ใส่ URL ของ OpenAPI Spec ลงไป: `http://localhost:8000/openapi.json`
+   - Postman จะสร้าง Collection ชื่อ "E-Commerce API" ให้พร้อมใช้งาน
+2. **การตั้งค่า Base URL:**
+   - ไปที่แท็บ **Variables** ของ Collection
+   - ตั้งค่าตัวแปร `baseUrl` ให้มีค่าเป็น `http://localhost:8000`
+3. **Flow การทดสอบจริง:**
+   - ยิง `POST /api/auth/register` เพื่อสร้าง User
+   - ยิง `POST /api/auth/login` แบบ `x-www-form-urlencoded` กรอก username/password แล้วก๊อปปี้ `access_token` จากผลลัพธ์
+   - กลับไปที่หน้าหลักของ Collection เลือกแท็บ **Authorization** เปลี่ยน Type เป็น **Bearer Token** แล้ววาง `access_token` ลงไป
+   - เริ่มกดยิงทดสอบ API เส้นอื่นๆ เช่น ซื้อของ หรือ ดูโปรไฟล์ ได้ทันที
+
+---
+
+## 6. การเชื่อมต่อกับ Frontend (Frontend Integration Guide)
+ระบบ Backend ถูกเตรียมความพร้อมสำหรับการนำไปต่อกับ Frontend (ไม่ว่าจะเป็น React, Vue, HTML ธรรมดา) ไว้เรียบร้อยแล้ว:
+
+### 1. การแก้ไขปัญหา CORS
+ในไฟล์ `app/main.py` มีการตั้งค่า `CORSMiddleware` ซึ่งอนุญาตให้โดเมนอื่น (เช่น `http://localhost:3000` ของ React) สามารถยิง Request ข้ามโดเมนมาดึงข้อมูลที่ Backend ได้โดยไม่ถูกเบราว์เซอร์บล็อก
+
+### 2. วิธีการส่ง Request จาก Frontend
+**การเรียก API สาธารณะ (เช่น ดูสินค้า):**
+Frontend สามารถใช้ `fetch()` หรือ `axios` ยิงดึงข้อมูลปกติได้เลย
+```javascript
+fetch("http://localhost:8000/api/products/")
+  .then(res => res.json())
+  .then(data => console.log(data));
+```
+
+**การเรียก API ที่ต้องล็อกอิน (เช่น การสั่งซื้อ หรือ ดูโปรไฟล์):**
+Frontend จะต้องเก็บ JWT Token ที่ได้ตอนล็อกอิน (มักเก็บใน LocalStorage หรือ SessionStorage) และทุกครั้งที่จะยิง API ให้แนบ Token ไปใน **Headers** ผ่านฟิลด์ `Authorization` ดังนี้:
+
+```javascript
+const token = localStorage.getItem("access_token");
+
+fetch("http://localhost:8000/api/users/me", {
+  method: "GET",
+  headers: {
+    "Authorization": `Bearer ${token}`, // แนบ Token ไปด้วยรูปแบบ "Bearer <token>"
+    "Content-Type": "application/json"
+  }
+})
+```
+
+---
+*เอกสารฉบับนี้อัปเดตล่าสุดตามระบบที่ทำงานจริงใน Environment ของ Docker*
