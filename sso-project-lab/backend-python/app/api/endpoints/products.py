@@ -34,7 +34,10 @@ def delete_existing_product(
     db: Session = Depends(get_db),
     current_admin = Depends(get_current_active_admin)
 ):
-    db_product = delete_product(db, product_id=product_id)
-    if not db_product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return {"message": "Product deleted successfully"}
+    try:
+        db_product = delete_product(db, product_id=product_id)
+        if not db_product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        return {"message": "Product deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

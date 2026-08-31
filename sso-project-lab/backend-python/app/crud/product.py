@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.models.product import Product
 from app.schemas.product import ProductCreate
 
@@ -18,6 +19,11 @@ def create_product(db: Session, product: ProductCreate):
 def delete_product(db: Session, product_id: int):
     db_product = db.query(Product).filter(Product.id == product_id).first()
     if db_product:
-        db.delete(db_product)
-        db.commit()
+        try:
+            db.delete(db_product)
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            raise ValueError("Cannot delete product because it is already referenced (e.g., in an order).")
     return db_product
+

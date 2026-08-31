@@ -5,7 +5,7 @@ services:
   # 1. RADIUS Server (FreeRADIUS)
   # ----------------------------------------------------
   freeradius:
-    image: freeradius/freeradius-server:latest
+    build: ./freeradius
     container_name: sso_radius
     ports:
       - "1812:1812/udp"
@@ -65,21 +65,7 @@ services:
       - kmitl_sso_net
     restart: unless-stopped
 
-  # ----------------------------------------------------
-  # 5. Backend Core (Node.js + Prisma)
-  # ----------------------------------------------------
-  backend-node:
-    build: ./backend-node
-    container_name: ecom_backend_node
-    environment:
-      - PORT=5000
-      - DATABASE_URL=mysql://ecom_user:ecom_password@mysql-db:3306/ecommerce_db
-      - JWT_SECRET=kmitl_chumphon_sso_secret_key
-    depends_on:
-      - mysql-db
-    networks:
-      - kmitl_sso_net
-    restart: unless-stopped
+
 
   # ----------------------------------------------------
   # 6. Backend Worker (Python)
@@ -87,9 +73,12 @@ services:
   backend-python:
     build: ./backend-python
     container_name: ecom_backend_python
+    ports:
+      - "8000:8000"
     environment:
       - PORT=8000
       - DATABASE_URL=mysql://ecom_user:ecom_password@mysql-db:3306/ecommerce_db
+      - SECRET_KEY=kmitl_chumphon_sso_secret_key
     depends_on:
       - mysql-db
     networks:
@@ -109,7 +98,6 @@ services:
     depends_on:
       - central-auth
       - frontend-next
-      - backend-node
       - backend-python
     networks:
       - kmitl_sso_net

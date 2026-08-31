@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "SSO E-Commerce API (FreeRADIUS)",
+		"description": "Collection สำหรับทดสอบระบบ SSO และระบบ E-Commerce เชื่อมโยงกับ FreeRADIUS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. SSO Login (FreeRADIUS)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.access_token) {",
+							"    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+							"    console.log(\"Saved access_token automatically!\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"student66000001\",\n  \"password\": \"password1234\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "ล็อกอินผ่าน Central Auth Service ซึ่งจะส่งข้อมูลไปตรวจสอบกับ FreeRADIUS และออก JWT Token อัตโนมัติ"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Current User Profile (Auto-Provisioned)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/users/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"me"
+					]
+				},
+				"description": "ดึงข้อมูลโปรไฟล์ผู้ใช้ปัจจุบันจาก Python Backend (ระบบจะสร้าง User record ให้อัตโนมัติหากเข้าใช้งานเป็นครั้งแรก)"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get Products List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/products/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"products",
+						""
+					]
+				},
+				"description": "ดึงรายการสินค้าทั้งหมดในร้านค้า"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Create Order (Checkout)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 1\n    }\n  ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/orders/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"orders",
+						""
+					]
+				},
+				"description": "สร้างคำสั่งซื้อสินค้า โดยตัดสต็อกและผูกเข้ากับบัญชีนักศึกษา"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get My Orders",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/orders/my-orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"orders",
+						"my-orders"
+					]
+				},
+				"description": "ดูประวัติคำสั่งซื้อทั้งหมดของนักศึกษาคนนี้"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -34,6 +34,13 @@ def get_user_orders(db: Session, user_id: int):
 def update_order_status(db: Session, order_id: int, status: str):
     order = db.query(Order).filter(Order.id == order_id).first()
     if order:
+        # If order is being cancelled, restore the stock
+        if status.lower() == "cancelled" and order.status.lower() != "cancelled":
+            for item in order.items:
+                product = db.query(Product).filter(Product.id == item.product_id).first()
+                if product:
+                    product.stock += item.quantity
+        
         order.status = status
         db.commit()
         db.refresh(order)

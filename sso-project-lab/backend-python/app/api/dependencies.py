@@ -18,6 +18,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
+        role: str = payload.get("role", "customer")
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
@@ -25,7 +26,17 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     user = get_user_by_username(db, username=token_data.username)
     if user is None:
-        raise credentials_exception
+        # Auto-provision the user if they came from SSO
+        from app.models.user import User
+        user = User(
+            username=token_data.username,
+            email=f"{token_data.username}@example.com",
+            password_hash="sso_managed",
+            role=role
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
     return user
 
 def get_current_active_admin(current_user = Depends(get_current_user)):
