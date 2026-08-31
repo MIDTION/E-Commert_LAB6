@@ -61,6 +61,10 @@ services:
     container_name: ecom_frontend
     environment:
       - NODE_ENV=development
+    volumes:
+      - ./frontend-next:/app
+      - /app/node_modules
+      - /app/.next
     networks:
       - kmitl_sso_net
     restart: unless-stopped
