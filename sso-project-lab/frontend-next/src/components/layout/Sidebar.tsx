@@ -27,47 +27,49 @@ export default function Sidebar() {
   if (!mounted) return null;
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-white dark:bg-[#1e1e1e] text-slate-600 dark:text-slate-300 w-72 border-r border-slate-200 dark:border-[#333] shadow-xl shadow-slate-200/40 dark:shadow-none transition-all duration-300">
+    <div className="flex flex-col h-full bg-white text-slate-600 w-72 border-r border-slate-200 shadow-[4px_0_24px_rgba(0,0,0,0.02)] transition-all duration-300">
       {/* Logo Area */}
-      <div className="p-6 border-b border-slate-200 dark:border-[#333]">
-        <Link href="/store" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <ShoppingCart className="w-5 h-5 text-white" />
+      <div className="p-6 border-b border-slate-100 flex items-center justify-center">
+        <Link href="/store" className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform group-hover:rotate-6 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <div className="flex flex-col">
-            <span className="font-black text-lg text-slate-800 dark:text-white leading-tight">
-              GAME<span className="text-amber-500">STORE</span>
+          <div className="flex flex-col items-center">
+            <span className="font-black text-2xl text-slate-800 tracking-tight">
+              TPEJ<span className="text-orange-500">STORE</span>
             </span>
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold tracking-widest uppercase">Premium</span>
+            <span className="text-xs text-blue-500 font-bold tracking-widest uppercase">Game ID Marketplace</span>
           </div>
         </Link>
       </div>
 
       {/* User Profile Area */}
-      <div className="p-5 border-b border-slate-200 dark:border-[#333] bg-slate-50 dark:bg-[#222]">
+      <div className="p-5 border-b border-slate-100 bg-slate-50/50">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0 border-2 border-white dark:border-slate-500 shadow-sm">
-            <span className="text-slate-700 dark:text-white font-bold text-base">
+          <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 shadow-sm border border-orange-200">
+            <span className="font-black text-lg">
               {mockUser.username.substring(0, 2).toUpperCase()}
             </span>
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">ยินดีต้อนรับ</span>
-            <span className="text-base text-slate-800 dark:text-white font-bold truncate">
+            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">ยินดีต้อนรับ</span>
+            <span className="text-base text-slate-800 font-black truncate">
               {mockUser.username}
             </span>
           </div>
         </div>
 
         {/* Highlighted Credit Box */}
-        <div className="bg-emerald-50 dark:bg-[#1a1d27] dark:bg-gradient-to-r dark:from-emerald-500/10 dark:to-teal-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl p-3 flex items-center justify-between shadow-inner gap-2">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 border border-blue-200 rounded-2xl p-3 flex flex-col items-center justify-center shadow-sm gap-1.5 mt-2">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
-              <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center shadow-sm shadow-blue-500/20">
+              <Wallet className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">ยอดเงินคงเหลือ</span>
+            <span className="text-xs font-bold text-blue-900">ยอดเงินคงเหลือ</span>
           </div>
-          <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 tracking-tight whitespace-nowrap truncate">
+          <span className="text-xl font-black text-blue-600 tracking-tight">
             {mockUser.credit_balance.toLocaleString()} ฿
           </span>
         </div>
@@ -84,13 +86,12 @@ export default function Sidebar() {
               <li key={link.name}>
                 <Link
                   href={link.href}
-                  className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
-                    isActive
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg shadow-orange-500/20 translate-x-1'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 font-medium hover:translate-x-1'
-                  }`}
+                  className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${isActive
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold shadow-md shadow-blue-500/20 translate-x-1'
+                      : 'text-slate-600 hover:text-orange-500 hover:bg-orange-50 font-bold hover:translate-x-1'
+                    }`}
                 >
-                  <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-amber-500 dark:group-hover:text-white'}`} />
+                  <Icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-orange-500'}`} />
                   <span className="text-sm tracking-wide">{link.name}</span>
                 </Link>
               </li>
@@ -100,33 +101,16 @@ export default function Sidebar() {
       </div>
 
       {/* Footer / Actions */}
-      <div className="p-4 border-t border-slate-200 dark:border-[#333] space-y-2">
-        <button
-          onClick={toggleTheme}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors duration-200 group"
-        >
-          {theme === 'dark' ? (
-            <>
-              <Sun className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-amber-500" />
-              <span className="font-medium text-sm tracking-wide">โหมดสว่าง</span>
-            </>
-          ) : (
-            <>
-              <Moon className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-indigo-500" />
-              <span className="font-medium text-sm tracking-wide">โหมดมืด</span>
-            </>
-          )}
-        </button>
-
+      <div className="p-4 border-t border-slate-100 space-y-2">
         <button
           onClick={() => {
             document.cookie = "sso_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             window.location.href = '/';
           }}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors duration-200 group"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-2xl text-rose-500 font-bold hover:text-white hover:bg-rose-500 transition-all duration-300 group shadow-sm border border-rose-100 hover:border-transparent hover:shadow-rose-500/20"
         >
-          <LogOut className="w-5 h-5 text-slate-400 dark:text-slate-500 group-hover:text-rose-500" />
-          <span className="font-medium text-sm tracking-wide">ออกจากระบบ</span>
+          <LogOut className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+          <span className="text-sm tracking-wide">ออกจากระบบ</span>
         </button>
       </div>
     </div>
@@ -135,14 +119,16 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-[#1e1e1e] border-b border-slate-200 dark:border-[#333] z-50 flex items-center justify-between px-4 transition-colors duration-300">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-100 z-50 flex items-center justify-between px-4">
         <Link href="/store" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-            <ShoppingCart className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 bg-gradient-to-tr from-blue-500 to-orange-500 rounded-lg flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <span className="font-black text-slate-800 dark:text-white">GAME<span className="text-amber-500">STORE</span></span>
+          <span className="font-black text-slate-800 tracking-tight">TPEJ<span className="text-orange-500">STORE</span></span>
         </Link>
-        <button 
+        <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-white"
         >
@@ -152,7 +138,7 @@ export default function Sidebar() {
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />

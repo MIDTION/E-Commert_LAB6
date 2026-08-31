@@ -6,11 +6,6 @@
   --foreground: #0f172a; /* slate-950 */
 }
 
-.dark {
-  --background: #0f172a; /* slate-950 */
-  --foreground: #f8fafc; /* slate-50 */
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

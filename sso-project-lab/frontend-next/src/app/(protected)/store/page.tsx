@@ -63,7 +63,7 @@ export default function StorePage() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
       
       {/* Hero Carousel Section */}
-      <div className="relative w-full h-[400px] md:h-[500px] rounded-[2rem] overflow-hidden mb-12 shadow-2xl group">
+      <div className="relative w-full h-[400px] md:h-[500px] rounded-[3rem] overflow-hidden mb-12 shadow-2xl shadow-blue-500/10 group border-4 border-white">
         {PROMO_BANNERS.map((banner, index) => (
           <div 
             key={banner.id}
@@ -74,28 +74,29 @@ export default function StorePage() {
             <img 
               src={banner.image} 
               alt={banner.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transform scale-105 group-hover:scale-100 transition-transform duration-3000 ease-out"
             />
-            {/* Richman-style Dark Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/70 to-transparent"></div>
+            {/* Bright Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/40 to-transparent mix-blend-multiply"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 to-transparent"></div>
             
             <div className="absolute inset-0 flex items-center p-8 md:p-16">
               <div className="max-w-2xl transform transition-transform duration-700 translate-y-0 opacity-100">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-sm font-bold tracking-wide mb-6 backdrop-blur-md">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500 text-white text-sm font-bold tracking-wide mb-6 shadow-lg shadow-orange-500/30">
                   <Flame className="w-4 h-4" />
                   HOT PROMOTION
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-4 drop-shadow-lg">
+                <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white leading-tight mb-4 drop-shadow-xl">
                   {banner.title.split(':').map((part, i, arr) => (
                     <span key={i}>
                       {part}
-                      {i < arr.length - 1 && <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">:</span>}
+                      {i < arr.length - 1 && <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-yellow-300">:</span>}
                       {i === 0 && arr.length > 1 && <br />}
                     </span>
                   ))}
                   {banner.title.indexOf(':') === -1 && banner.title}
                 </h1>
-                <p className="text-slate-300 text-lg md:text-xl max-w-xl">
+                <p className="text-blue-50 text-lg md:text-2xl max-w-xl font-medium drop-shadow-md">
                   {banner.subtitle}
                 </p>
               </div>
@@ -106,13 +107,13 @@ export default function StorePage() {
         {/* Carousel Controls */}
         <button 
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/30 hover:bg-white backdrop-blur-md text-white hover:text-blue-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
         <button 
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/30 hover:bg-white backdrop-blur-md text-white hover:text-blue-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-lg"
         >
           <ChevronRight className="w-6 h-6" />
         </button>
@@ -123,8 +124,8 @@ export default function StorePage() {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                index === currentSlide ? 'w-8 bg-amber-500' : 'w-2 bg-white/40 hover:bg-white/60'
+              className={`h-2 rounded-full transition-all duration-300 shadow-sm ${
+                index === currentSlide ? 'w-10 bg-orange-400' : 'w-2 bg-white/50 hover:bg-white'
               }`}
             />
           ))}
@@ -143,13 +144,13 @@ export default function StorePage() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all duration-300 ${
+                className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-black whitespace-nowrap transition-all duration-300 shadow-sm ${
                   isActive 
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shadow-slate-900/20 dark:shadow-white/10 scale-105' 
-                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/80'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105 border-transparent' 
+                    : 'bg-white border-2 border-slate-100 text-slate-500 hover:text-orange-500 hover:border-orange-200 hover:bg-orange-50'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-amber-500' : ''}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-orange-500'}`} />
                 {cat.label}
               </button>
             );
@@ -159,12 +160,12 @@ export default function StorePage() {
         {/* Search Bar */}
         <div className="relative max-w-md w-full shrink-0">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-400" />
+            <Search className="h-5 w-5 text-blue-400" />
           </div>
           <input
             type="text"
-            className="block w-full pl-11 pr-4 py-3.5 bg-white dark:bg-[#151821] border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all shadow-sm"
-            placeholder="Search for games or top-ups..."
+            className="block w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-100 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium shadow-sm hover:border-slate-200"
+            placeholder="ค้นหาเกม หรือ สินค้า..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -172,15 +173,15 @@ export default function StorePage() {
       </div>
 
       {/* Section Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <h2 className="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2">
+      <div className="flex items-center gap-4 mb-8">
+        <h2 className="text-3xl font-black text-slate-800 flex items-center gap-3">
           {activeCategory === 'all' ? (
-            <>Trending Now <Flame className="w-6 h-6 text-orange-500" /></>
+            <>กำลังฮิต <Flame className="w-8 h-8 text-orange-500 animate-pulse" /></>
           ) : (
             CATEGORIES.find(c => c.id === activeCategory)?.label
           )}
         </h2>
-        <div className="h-px flex-1 bg-gradient-to-r from-slate-200 dark:from-slate-800 to-transparent"></div>
+        <div className="h-1 flex-1 bg-gradient-to-r from-blue-100 via-orange-100 to-transparent rounded-full"></div>
       </div>
 
       {/* Product Grid */}
@@ -196,13 +197,13 @@ export default function StorePage() {
 
       {/* Empty State */}
       {filteredProducts.length === 0 && (
-        <div className="text-center py-24 bg-white/50 dark:bg-[#151821]/50 rounded-[2rem] border border-slate-200 dark:border-slate-800/50 border-dashed mt-4">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 dark:bg-[#1a1d27] mb-6 shadow-inner">
-            <Search className="w-10 h-10 text-slate-400 dark:text-slate-500" />
+        <div className="text-center py-24 bg-white rounded-[3rem] border-2 border-slate-100 border-dashed mt-4 shadow-sm">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2rem] bg-orange-50 mb-6 shadow-inner border border-orange-100">
+            <Search className="w-10 h-10 text-orange-400" />
           </div>
-          <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">No games found</h3>
-          <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-            We couldn't find anything matching "{searchTerm}" in this category.
+          <h3 className="text-3xl font-black text-slate-800 mb-3">ไม่พบสินค้า</h3>
+          <p className="text-slate-500 text-lg max-w-md mx-auto font-medium">
+            เราไม่พบสินค้าที่ตรงกับ "{searchTerm}" ลองค้นหาด้วยคำอื่นดูสิ
           </p>
         </div>
       )}

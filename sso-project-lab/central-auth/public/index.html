@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSO Login | E-Commerce Portal</title>
+  <title>TPEJ STORE | Login</title>
   <link rel="stylesheet" href="/auth/style.css">
   <!-- Note: We use /auth/style.css because Nginx proxies /auth/ to this service -->
 </head>
+
 <body>
-  
+
   <div class="background-container">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -19,12 +21,13 @@
     <div class="login-card">
       <div class="logo-container">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
-      
-      <h1 class="title">Central Authentication</h1>
-      <p class="subtitle">Log in with your organizational account to access the E-Commerce Portal.</p>
+
+      <h1 class="title">TPEJ <span style="color: #f97316;">STORE</span></h1>
+      <p class="subtitle">เข้าสู่ระบบเพื่อใช้งาน Game ID Marketplace</p>
 
       <div id="error-message" class="alert hidden">
         <span id="error-text">Invalid username or password</span>
@@ -33,12 +36,14 @@
       <form id="login-form">
         <div class="input-group">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username">
+          <input type="text" id="username" name="username" placeholder="Enter your username" required
+            autocomplete="username">
         </div>
 
         <div class="input-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+          <input type="password" id="password" name="password" placeholder="••••••••" required
+            autocomplete="current-password">
         </div>
 
         <button type="submit" id="submit-btn" class="submit-btn">
@@ -48,11 +53,12 @@
       </form>
 
       <div class="footer">
-        Secured by KMITL Central SSO
+        Powered by TPEJ STORE
       </div>
     </div>
   </main>
 
   <script src="/auth/script.js"></script>
 </body>
+
 </html>
