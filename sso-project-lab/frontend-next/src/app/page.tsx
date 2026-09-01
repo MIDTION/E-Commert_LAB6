@@ -1,87 +1,60 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import React, { useEffect, useState } from "react";
-import ProductCard from "@/components/ui/ProductCard";
-import { getProductsAPI, Product } from "@/lib/api";
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('sso_token');
 
-export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        const data = await getProductsAPI();
-        setProducts(data);
-      } catch (err: any) {
-        setError(err.message || "Failed to load products");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadProducts();
-  }, []);
+  if (token) {
+    redirect('/store');
+  }
 
   return (
-    <div className="w-full">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden hero-gradient text-on-surface">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-20 relative z-10 flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 space-y-6">
-            <h1 className="font-display-lg-mobile md:font-display-lg text-primary">Level Up Your Arsenal</h1>
-            <p className="font-body-base text-lg text-on-surface-variant max-w-xl">
-              Equip yourself with the best gear in the game. Premium equipment for gamers who demand excellence.
-            </p>
-            <div className="pt-4 flex gap-4">
-              <button className="cta-button font-bold py-3 px-8 rounded-full transition-all">Shop Now</button>
-              <button className="glass-panel text-primary font-bold py-3 px-8 rounded-full hover:bg-surface-variant transition-colors">Explore</button>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-orange-50 flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-[-20%] left-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
+      <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-amber-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000"></div>
+
+      <main className="z-10 flex flex-col items-center justify-center p-8 text-center max-w-3xl">
+        <div className="backdrop-blur-xl bg-white/70 p-12 rounded-[2rem] border border-white/50 shadow-2xl flex flex-col items-center transition-all hover:shadow-blue-500/20">
+          <div className="w-24 h-24 bg-gradient-to-tr from-blue-500 to-orange-400 rounded-[2rem] flex items-center justify-center mb-8 shadow-xl shadow-orange-500/30 transform rotate-3 hover:rotate-6 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <div className="flex-1 relative hidden md:block">
-            <div className="aspect-square bg-secondary-container/50 rounded-full blur-3xl absolute inset-10"></div>
-            {/* Replace with actual hero image */}
-            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop" alt="Gaming Setup" className="relative z-10 rounded-2xl shadow-2xl floating-layer object-cover aspect-video" />
+
+          <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-500 tracking-tight mb-4 drop-shadow-sm">
+            TPEJ STORE
+          </h1>
+
+          <p className="text-slate-600 text-lg md:text-xl max-w-md mb-10 leading-relaxed font-medium">
+            Game ID Marketplace. Secure, fast, and seamless authentication for all our services.
+          </p>
+
+          <a
+            href="/auth/"
+            className="group relative inline-flex items-center justify-center px-10 py-4 font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-500/30 w-full md:w-auto shadow-xl shadow-orange-500/30 overflow-hidden"
+          >
+            <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black mix-blend-overlay"></span>
+            <span className="relative flex items-center gap-3 text-lg">
+              Login with SSO
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </span>
+          </a>
+
+          <div className="mt-8 text-sm text-slate-500 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.965 11.965 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Secured by KMITL Central Auth
           </div>
         </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16">
-        <div className="flex justify-between items-end mb-10">
-          <div>
-            <h2 className="font-headline-md text-primary mb-2">Featured Gear</h2>
-            <p className="text-on-surface-variant">Top rated equipment by pro players</p>
-          </div>
-          <button className="hidden md:flex items-center gap-1 text-primary font-bold hover:text-tertiary transition-colors">
-            View All <span className="material-symbols-outlined text-sm">arrow_forward</span>
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="h-[400px] bg-surface-variant animate-pulse rounded-xl"></div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="bg-error-container text-on-error-container p-4 rounded-xl">
-            {error}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.slice(0, 8).map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                badge={product.stock_status === "sold_out" ? "Sold Out" : undefined}
-                badgeColor={product.stock_status === "sold_out" ? "error" : "primary"}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      </main>
     </div>
   );
 }
