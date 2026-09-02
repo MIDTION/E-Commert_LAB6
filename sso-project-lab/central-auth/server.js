@@ -94,7 +94,7 @@ app.post('/api/login', async (req, res) => {
 
     if (isAuthenticated) {
       // Create JWT
-      const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+      const token = jwt.sign({ username, sub: username }, JWT_SECRET, { expiresIn: '24h' });
 
       // Set Cookie
       // Path must be '/' so it's accessible by the frontend service
@@ -113,7 +113,7 @@ app.post('/api/login', async (req, res) => {
     console.error('RADIUS Error:', error);
     // Fallback for demonstration if RADIUS is down but credentials match the mock
     if (username === 'student66000001' && password === 'password1234') {
-      const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '24h' });
+      const token = jwt.sign({ username, sub: username }, JWT_SECRET, { expiresIn: '24h' });
       res.cookie('sso_token', token, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',

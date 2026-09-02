@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CreditCard, Smartphone, Banknote, ShieldCheck, ChevronRight, Check } from 'lucide-react';
-import { mockUser } from '@/data/mockData';
+import { api, User } from '@/lib/api';
 
 const PAYMENT_METHODS = [
   { id: 'promptpay', name: 'QR PromptPay', icon: Smartphone, color: 'bg-blue-500', fee: 'ฟรีค่าธรรมเนียม' },
@@ -18,6 +18,11 @@ export default function TopUpPage() {
   const [customAmount, setCustomAmount] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    api.getUser().then(setUser);
+  }, []);
 
   const handleTopup = () => {
     const amount = selectedAmount === 'custom' ? parseInt(customAmount) : selectedAmount;
@@ -29,8 +34,10 @@ export default function TopUpPage() {
       setIsProcessing(false);
       setIsSuccess(true);
       
-      // Add credit
-      mockUser.credit_balance += amount;
+      // Update local state temporarily
+      if (user) {
+        setUser({ ...user, credit_balance: user.credit_balance + amount });
+      }
       
     }, 2000);
   };
@@ -69,7 +76,7 @@ export default function TopUpPage() {
         <div className="flex items-center gap-4 bg-blue-50 px-6 py-4 rounded-3xl border border-blue-100 shadow-inner">
           <div className="text-right">
             <div className="text-sm text-blue-500 font-bold mb-1">ยอดเครดิตคงเหลือ</div>
-            <div className="text-3xl font-black text-blue-700">{mockUser.credit_balance.toLocaleString()} ฿</div>
+            <div className="text-3xl font-black text-blue-700">{user ? user.credit_balance.toLocaleString() : '0'} ฿</div>
           </div>
           <div className="w-14 h-14 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
             <Banknote className="w-7 h-7" />

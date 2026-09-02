@@ -7,14 +7,18 @@ import { useEffect, useState } from 'react';
 import { mockUser } from '@/data/mockData';
 import { useTheme } from '@/components/ThemeProvider';
 
+import { api, User } from '@/lib/api';
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    api.getUser().then(setUser);
   }, []);
 
   const navLinks = [
@@ -50,13 +54,13 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 shadow-sm border border-orange-200">
             <span className="font-black text-lg">
-              {mockUser.username.substring(0, 2).toUpperCase()}
+              {user ? user.username.substring(0, 2).toUpperCase() : '..'}
             </span>
           </div>
           <div className="flex flex-col overflow-hidden">
             <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">ยินดีต้อนรับ</span>
             <span className="text-base text-slate-800 font-black truncate">
-              {mockUser.username}
+              {user ? user.username : 'Loading...'}
             </span>
           </div>
         </div>
@@ -70,7 +74,7 @@ export default function Sidebar() {
             <span className="text-xs font-bold text-blue-900">ยอดเงินคงเหลือ</span>
           </div>
           <span className="text-xl font-black text-blue-600 tracking-tight">
-            {mockUser.credit_balance.toLocaleString()} ฿
+            {user ? user.credit_balance.toLocaleString() : '0'} ฿
           </span>
         </div>
       </div>

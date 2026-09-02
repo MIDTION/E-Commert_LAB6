@@ -4,18 +4,19 @@ import { useState, useEffect } from 'react';
 import { PackageOpen } from 'lucide-react';
 import InventoryItem from '@/components/inventory/InventoryItem';
 import { MOCK_INVENTORY } from '@/data/mockData';
+import { api } from '@/lib/api';
 
 export default function InventoryPage() {
-  const [items, setItems] = useState(MOCK_INVENTORY);
+  const [items, setItems] = useState<any[]>(MOCK_INVENTORY);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('added_inventory') || '[]');
-    if (saved.length > 0) {
-      // Create a map to ensure we don't duplicate items if MOCK_INVENTORY already has them
-      const existingIds = new Set(MOCK_INVENTORY.map(item => item.id));
-      const newItems = saved.filter((item: any) => !existingIds.has(item.id));
-      setItems([...newItems, ...MOCK_INVENTORY]);
+    async function fetchInventory() {
+      const data = await api.getInventory();
+      if (data && data.length > 0) {
+        setItems(data);
+      }
     }
+    fetchInventory();
   }, []);
 
   return (

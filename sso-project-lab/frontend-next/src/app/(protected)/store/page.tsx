@@ -6,6 +6,7 @@ import CheckoutModal from '@/components/store/CheckoutModal';
 import ProductCard from '@/components/store/ProductCard';
 import { MOCK_PRODUCTS } from '@/data/mockData';
 import { Product } from '@/types';
+import { api } from '@/lib/api';
 
 const PROMO_BANNERS = [
   {
@@ -40,6 +41,19 @@ export default function StorePage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      const data = await api.getProducts();
+      if (data.length > 0) {
+        setProducts(data);
+      } else {
+        setProducts(MOCK_PRODUCTS);
+      }
+    }
+    loadProducts();
+  }, []);
 
   // Auto-playing carousel
   useEffect(() => {
@@ -52,7 +66,7 @@ export default function StorePage() {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % PROMO_BANNERS.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + PROMO_BANNERS.length) % PROMO_BANNERS.length);
 
-  const filteredProducts = MOCK_PRODUCTS.filter(p => {
+  const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           p.game.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === 'all' || p.category === activeCategory || (activeCategory === 'premium' && p.price > 300);

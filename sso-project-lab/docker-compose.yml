@@ -28,6 +28,9 @@ services:
       - RADIUS_HOST=freeradius
       - RADIUS_SECRET=testing123
       - JWT_SECRET=kmitl_chumphon_sso_secret_key
+    volumes:
+      - ./central-auth:/app
+      - /app/node_modules
     networks:
       - kmitl_sso_net
     depends_on:
@@ -46,7 +49,7 @@ services:
       - MYSQL_USER=ecom_user
       - MYSQL_PASSWORD=ecom_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -70,8 +73,6 @@ services:
       - kmitl_sso_net
     restart: unless-stopped
 
-
-
   # ----------------------------------------------------
   # 6. Backend Worker (Python)
   # ----------------------------------------------------
@@ -80,6 +81,8 @@ services:
     container_name: ecom_backend_python
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend-python:/app
     environment:
       - PORT=8000
       - DATABASE_URL=mysql://ecom_user:ecom_password@mysql-db:3306/ecommerce_db
