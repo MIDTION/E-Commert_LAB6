@@ -106,7 +106,7 @@ export const api = {
         name: p.name,
         price: Number(p.price),
         game: p.game || p.name,
-        category: p.game_type === 'mobile' ? 'mobile' : 'pc',
+        category: p.category || 'pc',
         image: p.image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop',
         description: p.description || "No description available"
       }));
