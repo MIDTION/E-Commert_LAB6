@@ -124,6 +124,15 @@ app.post(['/api/login', '/api/auth/login'], async (req, res) => {
   }
 });
 
+// Logout: sso_token is HttpOnly, so client-side JS can never clear it
+// (document.cookie writes to it are silently ignored) — only the server that
+// set it can clear it, by sending back a Set-Cookie with the same path that
+// immediately expires.
+app.post(['/api/logout', '/api/auth/logout'], (req, res) => {
+  res.clearCookie('sso_token', { path: '/' });
+  return res.status(200).json({ success: true, message: 'Logged out' });
+});
+
 // Fallback route for SPA if needed
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

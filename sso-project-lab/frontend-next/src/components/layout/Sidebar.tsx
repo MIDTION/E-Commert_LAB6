@@ -107,8 +107,14 @@ export default function Sidebar() {
       {/* Footer / Actions */}
       <div className="p-4 border-t border-slate-100 space-y-2">
         <button
-          onClick={() => {
-            document.cookie = "sso_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          onClick={async () => {
+            // sso_token is HttpOnly — document.cookie can never clear it from
+            // the client, the server has to send back an expired Set-Cookie
+            try {
+              await fetch('/auth/api/logout', { method: 'POST' });
+            } catch {
+              // even if the request fails, still send the user home
+            }
             window.location.href = '/';
           }}
           className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-2xl text-rose-500 font-bold hover:text-white hover:bg-rose-500 transition-all duration-300 group shadow-sm border border-rose-100 hover:border-transparent hover:shadow-rose-500/20"
