@@ -10,6 +10,9 @@ student66000002  Cleartext-Password := "password5678"
 admin            Cleartext-Password := "admin1234"
                  Reply-Message = "Administrator"
 
+admin66000001    Cleartext-Password := "password1234"
+                 Reply-Message = "Administrator"
+
 # do not remove the line below: standard fallback, anyone not matching above is rejected here
 DEFAULT  Auth-Type := Reject
          Reply-Message = "Login incorrect"

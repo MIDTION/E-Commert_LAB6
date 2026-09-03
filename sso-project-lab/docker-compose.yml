@@ -1,5 +1,3 @@
-
-
 services:
   # ----------------------------------------------------
   # 1. RADIUS Server (FreeRADIUS)
@@ -27,6 +25,9 @@ services:
       - RADIUS_SECRET=${RADIUS_SECRET}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+    volumes:
+      - ./central-auth:/app
+      - /app/node_modules
     networks:
       - kmitl_sso_net
     depends_on:
@@ -66,18 +67,28 @@ services:
     container_name: ecom_frontend
     environment:
       - NODE_ENV=development
+      - JWT_SECRET=${JWT_SECRET}
+    command: npm run dev
+    volumes:
+      - ./frontend-next:/app
+      - /app/node_modules
+      - /app/.next
     networks:
       - kmitl_sso_net
     restart: unless-stopped
 
   # ----------------------------------------------------
-  # 5. Backend Core (Node.js + Prisma)
+  # 5. Backend Worker (Python)
   # ----------------------------------------------------
-  backend-node:
-    build: ./backend-node
-    container_name: ecom_backend_node
+  backend-python:
+    build: ./backend-python
+    container_name: ecom_backend_python
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-python:/app
     environment:
-      - PORT=${CORE_API_PORT}
+      - PORT=${WORKER_API_PORT}
       - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql-db:3306/${MYSQL_DATABASE}
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
@@ -88,24 +99,8 @@ services:
     restart: unless-stopped
 
   # ----------------------------------------------------
-  # 6. Backend Worker (Python)
+  # 6. Nginx (Reverse Proxy & Load Balancer)
   # ----------------------------------------------------
-  backend-python:
-    build: ./backend-python
-    container_name: ecom_backend_python
-    environment:
-      - PORT=${WORKER_API_PORT}
-      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql-db:3306/${MYSQL_DATABASE}
-    depends_on:
-      mysql-db:
-        condition: service_healthy
-    networks:
-      - kmitl_sso_net
-    restart: unless-stopped
-
-  # ----------------------------------------------------
-  # 7. Nginx (Reverse Proxy & Load Balancer)
-  # ---------------------------------------------------- 
   nginx:
     image: nginx:alpine
     container_name: sso_nginx_proxy
@@ -116,7 +111,6 @@ services:
     depends_on:
       - central-auth
       - frontend-next
-      - backend-node
       - backend-python
     networks:
       - kmitl_sso_net
