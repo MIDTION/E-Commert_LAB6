@@ -24,7 +24,15 @@ def create_order(db: Session, order: OrderCreate, user_id: int):
         price = product.price * item.quantity
         total_price += price
         products_to_update.append((product, item.quantity))
-        db_order_items.append(OrderItem(product_id=item.product_id, quantity=item.quantity, price=product.price))
+        db_order_items.append(OrderItem(
+            product_id=item.product_id,
+            quantity=item.quantity,
+            price=product.price,
+            # credential handed to the buyer is fulfilled synchronously here, so the
+            # order is genuinely "completed" the moment it's paid, not just "paid"
+            credential_username=product.credential_username,
+            credential_password=product.credential_password,
+        ))
 
     # Check credit balance
     current_balance = float(user.credit_balance or 0.0)
@@ -39,7 +47,7 @@ def create_order(db: Session, order: OrderCreate, user_id: int):
     for product, qty in products_to_update:
         product.stock -= qty
 
-    db_order = Order(user_id=user_id, status="paid", total_price=total_price, items=db_order_items)
+    db_order = Order(user_id=user_id, status="completed", total_price=total_price, items=db_order_items)
     db.add(db_order)
     db.commit()
     db.refresh(db_order)

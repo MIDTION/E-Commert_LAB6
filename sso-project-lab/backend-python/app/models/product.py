@@ -11,3 +11,6 @@ class Product(Base):
     stock = Column(Integer, default=0)
     category = Column(String(50), default="pc")
     image = Column(String(255), nullable=True)
+    # game account credential handed to the buyer once purchased (admin-only, never in public listing)
+    credential_username = Column(String(100), nullable=True)
+    credential_password = Column(String(100), nullable=True)

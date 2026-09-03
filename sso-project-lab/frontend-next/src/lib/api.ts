@@ -121,15 +121,22 @@ export const api = {
   async getInventory(): Promise<InventoryItem[]> {
     try {
       const data = await fetchWithAuth("/orders/my-orders");
-      return data.map((order: any) => ({
-        id: order.id.toString(),
-        orderId: `ORD-${order.id}`,
-        game: 'Product',
-        username: 'auto-delivered',
-        status: order.status === 'completed' ? 'ready' : (order.status === 'pending' ? 'checking' : 'failed'),
-        purchaseDate: new Date().toISOString(),
-        image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop'
-      }));
+      const items: any[] = [];
+      data.forEach((order: any) => {
+        (order.items || []).forEach((oi: any) => {
+          items.push({
+            id: `${order.id}-${oi.id}`,
+            orderId: `ORD-${order.id}`,
+            game: oi.product_name || 'Product',
+            username: oi.credential_username || undefined,
+            password: oi.credential_password || undefined,
+            status: order.status === 'completed' ? 'ready' : (order.status === 'pending' ? 'checking' : 'failed'),
+            purchaseDate: new Date().toISOString(),
+            image: oi.product_image || 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop'
+          });
+        });
+      });
+      return items;
     } catch (err) {
       return [];
     }
