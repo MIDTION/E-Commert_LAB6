@@ -30,7 +30,7 @@ export interface InventoryItem {
   image: string;
 }
 
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = "/api/worker";
 
 function getCookie(name: string) {
   if (typeof document === 'undefined') return null;

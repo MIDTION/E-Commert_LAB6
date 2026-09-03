@@ -101,7 +101,7 @@ app.post(['/api/login', '/api/auth/login'], async (req, res) => {
       // Set Cookie
       // Path must be '/' so it's accessible by the frontend service
       res.cookie('sso_token', token, {
-        httpOnly: false, // Allows Next.js and client to read if needed
+        httpOnly: true, // Allows Next.js and client to read if needed
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         path: '/' 
@@ -120,26 +120,6 @@ app.post(['/api/login', '/api/auth/login'], async (req, res) => {
     }
   } catch (error) {
     console.error('RADIUS Error:', error);
-    // Fallback for demonstration if RADIUS is down but credentials match mock users
-    if ((username === 'student66000001' || username === 'admin66000001') && password === 'password1234') {
-      const fallbackRole = username.toLowerCase().startsWith('admin') ? 'admin' : 'customer';
-      const token = jwt.sign({ username, sub: username, role: fallbackRole }, JWT_SECRET, { expiresIn: '24h' });
-      res.cookie('sso_token', token, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000,
-        path: '/'
-      });
-      return res.status(200).json({
-        success: true,
-        message: 'Login successful (Fallback)',
-        access_token: token,
-        token_type: 'bearer',
-        role: fallbackRole,
-        user: { username, role: fallbackRole }
-      });
-    }
-    
     return res.status(500).json({ success: false, message: 'Authentication service unavailable' });
   }
 });

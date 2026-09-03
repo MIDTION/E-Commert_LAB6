@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # Optional direct URL (used by docker-compose)
     DATABASE_URL: Optional[str] = None
 
-    SECRET_KEY: str = "kmitl_chumphon_sso_secret_key"
+    JWT_SECRET: str = "kmitl_chumphon_sso_secret_key"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
