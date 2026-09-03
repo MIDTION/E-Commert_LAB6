@@ -13,7 +13,7 @@ services:
       # จำลอง Client (Network ที่อนุญาต) และ Shared Secret
       - RAD_CLIENTS=172.16.0.0/12@testing123
       # จำลองข้อมูลนักศึกษาสำหรับทดสอบเข้าสู่ระบบ (username@password)
-      - RAD_USERS=student66000001@password1234
+      - RAD_USERS=student66000001@password1234,admin66000001@password1234
     networks:
       - kmitl_sso_net
 

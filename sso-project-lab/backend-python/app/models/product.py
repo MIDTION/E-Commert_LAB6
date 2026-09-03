@@ -9,3 +9,5 @@ class Product(Base):
     description = Column(Text, nullable=True)
     price = Column(Float, nullable=False)
     stock = Column(Integer, default=0)
+    category = Column(String(50), default="pc")
+    image = Column(String(255), nullable=True)

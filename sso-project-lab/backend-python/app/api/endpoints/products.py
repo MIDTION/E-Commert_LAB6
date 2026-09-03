@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -20,7 +20,7 @@ def read_product(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Product not found")
     return db_product
 
-@router.post("/", response_model=ProductResponse)
+@router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 def create_new_product(
     product: ProductCreate, 
     db: Session = Depends(get_db),
@@ -38,6 +38,10 @@ def delete_existing_product(
         db_product = delete_product(db, product_id=product_id)
         if not db_product:
             raise HTTPException(status_code=404, detail="Product not found")
-        return {"message": "Product deleted successfully"}
+        return {
+            "success": True, 
+            "message": f"Product {product_id} ('{db_product.name}') deleted successfully",
+            "deleted_product_id": product_id
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

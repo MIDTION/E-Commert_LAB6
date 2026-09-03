@@ -24,22 +24,26 @@ export default function TopUpPage() {
     api.getUser().then(setUser);
   }, []);
 
-  const handleTopup = () => {
+  const handleTopup = async () => {
     const amount = selectedAmount === 'custom' ? parseInt(customAmount) : selectedAmount;
     if (!amount || amount <= 0) return;
 
     setIsProcessing(true);
-    // Mock API Call
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsSuccess(true);
-      
-      // Update local state temporarily
-      if (user) {
-        setUser({ ...user, credit_balance: user.credit_balance + amount });
+    try {
+      const res = await api.topup(amount);
+      if (res.success) {
+        setIsSuccess(true);
+        if (user) {
+          setUser({ ...user, credit_balance: res.new_balance ?? (user.credit_balance + amount) });
+        }
+      } else {
+        alert(res.error || "เกิดข้อผิดพลาดในการเติมเครดิต");
       }
-      
-    }, 2000);
+    } catch (err: any) {
+      alert(err.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ API");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (isSuccess) {

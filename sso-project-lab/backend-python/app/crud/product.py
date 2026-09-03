@@ -10,7 +10,8 @@ def get_product(db: Session, product_id: int):
     return db.query(Product).filter(Product.id == product_id).first()
 
 def create_product(db: Session, product: ProductCreate):
-    db_product = Product(**product.dict())
+    data = product.model_dump() if hasattr(product, "model_dump") else product.dict()
+    db_product = Product(**data)
     db.add(db_product)
     db.commit()
     db.refresh(db_product)

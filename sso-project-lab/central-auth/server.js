@@ -82,19 +82,21 @@ const authenticateWithRadius = (username, password) => {
 };
 
 // Login Endpoint
-app.post('/api/login', async (req, res) => {
+app.post(['/api/login', '/api/auth/login'], async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ success: false, message: 'Username and password are required' });
   }
 
+  const role = username.toLowerCase().startsWith('admin') ? 'admin' : 'customer';
+
   try {
     const isAuthenticated = await authenticateWithRadius(username, password);
 
     if (isAuthenticated) {
-      // Create JWT
-      const token = jwt.sign({ username, sub: username }, JWT_SECRET, { expiresIn: '24h' });
+      // Create JWT with username, sub, and role
+      const token = jwt.sign({ username, sub: username, role }, JWT_SECRET, { expiresIn: '24h' });
 
       // Set Cookie
       // Path must be '/' so it's accessible by the frontend service
@@ -105,22 +107,37 @@ app.post('/api/login', async (req, res) => {
         path: '/' 
       });
 
-      return res.status(200).json({ success: true, message: 'Login successful' });
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        access_token: token,
+        token_type: 'bearer',
+        role: role,
+        user: { username, role }
+      });
     } else {
       return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
   } catch (error) {
     console.error('RADIUS Error:', error);
-    // Fallback for demonstration if RADIUS is down but credentials match the mock
-    if (username === 'student66000001' && password === 'password1234') {
-      const token = jwt.sign({ username, sub: username }, JWT_SECRET, { expiresIn: '24h' });
+    // Fallback for demonstration if RADIUS is down but credentials match mock users
+    if ((username === 'student66000001' || username === 'admin66000001') && password === 'password1234') {
+      const fallbackRole = username.toLowerCase().startsWith('admin') ? 'admin' : 'customer';
+      const token = jwt.sign({ username, sub: username, role: fallbackRole }, JWT_SECRET, { expiresIn: '24h' });
       res.cookie('sso_token', token, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 24 * 60 * 60 * 1000,
         path: '/'
       });
-      return res.status(200).json({ success: true, message: 'Login successful (Fallback)' });
+      return res.status(200).json({
+        success: true,
+        message: 'Login successful (Fallback)',
+        access_token: token,
+        token_type: 'bearer',
+        role: fallbackRole,
+        user: { username, role: fallbackRole }
+      });
     }
     
     return res.status(500).json({ success: false, message: 'Authentication service unavailable' });

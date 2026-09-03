@@ -2,12 +2,12 @@
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
 		"name": "SSO E-Commerce API (FreeRADIUS)",
-		"description": "Collection สำหรับทดสอบระบบ SSO และระบบ E-Commerce เชื่อมโยงกับ FreeRADIUS",
+		"description": "Collection สำหรับทดสอบระบบ SSO และระบบ E-Commerce เชื่อมโยงกับ FreeRADIUS รองรับการเพิ่มสินค้า เติมเครดิต ลบสินค้า และสั่งซื้อ",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "1. SSO Login (FreeRADIUS)",
+			"name": "1. SSO Login - Student",
 			"event": [
 				{
 					"listen": "test",
@@ -16,7 +16,7 @@
 							"var jsonData = pm.response.json();",
 							"if (jsonData.access_token) {",
 							"    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
-							"    console.log(\"Saved access_token automatically!\");",
+							"    console.log(\"Saved student access_token:\", jsonData.access_token);",
 							"}"
 						],
 						"type": "text/javascript"
@@ -47,12 +47,58 @@
 						"login"
 					]
 				},
-				"description": "ล็อกอินผ่าน Central Auth Service ซึ่งจะส่งข้อมูลไปตรวจสอบกับ FreeRADIUS และออก JWT Token อัตโนมัติ"
+				"description": "ล็อกอินบัญชีนักศึกษาผ่าน Central Auth Service (ตรวจสอบผ่าน FreeRADIUS) เพื่อรับ JWT Token (role: customer)"
 			},
 			"response": []
 		},
 		{
-			"name": "2. Get Current User Profile (Auto-Provisioned)",
+			"name": "2. SSO Login - Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.access_token) {",
+							"    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+							"    pm.collectionVariables.set(\"admin_token\", jsonData.access_token);",
+							"    console.log(\"Saved admin access_token:\", jsonData.access_token);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"admin66000001\",\n  \"password\": \"password1234\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "ล็อกอินบัญชีผู้ดูแลระบบผ่าน Central Auth Service (FreeRADIUS) เพื่อรับ JWT Token ที่มีสิทธิ์ Admin (role: admin)"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get My Profile & Balance",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -79,12 +125,53 @@
 						"me"
 					]
 				},
-				"description": "ดึงข้อมูลโปรไฟล์ผู้ใช้ปัจจุบันจาก Python Backend (ระบบจะสร้าง User record ให้อัตโนมัติหากเข้าใช้งานเป็นครั้งแรก)"
+				"description": "ดึงข้อมูลโปรไฟล์ของผู้ใช้ปัจจุบันและยอดเครดิตคงเหลือ (credit_balance) จากบัญชี SSO"
 			},
 			"response": []
 		},
 		{
-			"name": "3. Get Products List",
+			"name": "4. Top-Up Credit",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"amount\": 500\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/users/topup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"topup"
+					]
+				},
+				"description": "เติมเครดิตเข้าสู่บัญชีของผู้ใช้ปัจจุบันที่ยืนยันตัวตนผ่าน SSO"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get Products List",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -101,12 +188,85 @@
 						""
 					]
 				},
-				"description": "ดึงรายการสินค้าทั้งหมดในร้านค้า"
+				"description": "ดึงรายการสินค้าทั้งหมดในระบบร้านค้า"
 			},
 			"response": []
 		},
 		{
-			"name": "4. Create Order (Checkout)",
+			"name": "6. Add New Product (Admin)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Minecraft Java & Bedrock Edition\",\n  \"description\": \"Full Access PC Game Key with Instant Delivery\",\n  \"price\": 199.0,\n  \"stock\": 50,\n  \"category\": \"pc\",\n  \"image\": \"https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/products/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"products",
+						""
+					]
+				},
+				"description": "เพิ่มสินค้าใหม่เข้าสู่ระบบ (ต้องใช้ Token ของ Admin เช่น บัญชี admin66000001)"
+			},
+			"response": []
+		},
+		{
+			"name": "7. Delete Product (Admin)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/products/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"products",
+						"1"
+					]
+				},
+				"description": "ลบสินค้าออกจากระบบตาม ID (ต้องใช้ Token ของ Admin และสินค้าต้องไม่ถูกผูกอยู่ในคำสั่งซื้อที่มีอยู่)"
+			},
+			"response": []
+		},
+		{
+			"name": "8. Create Order (Checkout with Credit)",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -142,12 +302,12 @@
 						""
 					]
 				},
-				"description": "สร้างคำสั่งซื้อสินค้า โดยตัดสต็อกและผูกเข้ากับบัญชีนักศึกษา"
+				"description": "สร้างคำสั่งซื้อสินค้า โดยจะตรวจสอบยอดเครดิตของผู้ใช้ หากพอจะตัดสต็อกและหักยอดเครดิตอัตโนมัติ"
 			},
 			"response": []
 		},
 		{
-			"name": "5. Get My Orders",
+			"name": "9. Get My Orders",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -174,7 +334,7 @@
 						"my-orders"
 					]
 				},
-				"description": "ดูประวัติคำสั่งซื้อทั้งหมดของนักศึกษาคนนี้"
+				"description": "ดูประวัติคำสั่งซื้อทั้งหมดของบัญชีที่ล็อกอินอยู่"
 			},
 			"response": []
 		}
@@ -182,6 +342,11 @@
 	"variable": [
 		{
 			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "admin_token",
 			"value": "",
 			"type": "string"
 		}

@@ -148,5 +148,49 @@ export const api = {
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to purchase product" };
     }
+  },
+
+  /**
+   * Top up credits
+   */
+  async topup(amount: number): Promise<{ success: boolean; new_balance?: number; message?: string; error?: string }> {
+    try {
+      const data = await fetchWithAuth("/users/topup", {
+        method: "POST",
+        body: JSON.stringify({ amount }),
+      });
+      return { success: true, new_balance: data.new_balance, message: data.message };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Failed to top up credit" };
+    }
+  },
+
+  /**
+   * Add a new product (Admin)
+   */
+  async addProduct(product: { name: string; description?: string; price: number; stock: number; category?: string; image?: string }): Promise<{ success: boolean; product?: any; error?: string }> {
+    try {
+      const data = await fetchWithAuth("/products/", {
+        method: "POST",
+        body: JSON.stringify(product),
+      });
+      return { success: true, product: data };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Failed to add product" };
+    }
+  },
+
+  /**
+   * Delete a product (Admin)
+   */
+  async deleteProduct(productId: string | number): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const data = await fetchWithAuth(`/products/${productId}`, {
+        method: "DELETE",
+      });
+      return { success: true, message: data.message };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Failed to delete product" };
+    }
   }
 };

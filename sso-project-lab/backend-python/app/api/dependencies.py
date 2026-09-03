@@ -18,7 +18,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username = payload.get("sub") or payload.get("username")
-        role: str = payload.get("role", "customer")
+        role: str = payload.get("role")
+        if not role:
+            role = "admin" if (username and username.lower().startswith("admin")) else "customer"
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
@@ -32,14 +34,24 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             username=token_data.username,
             email=f"{token_data.username}@example.com",
             password_hash="sso_managed",
-            role=role
+            role=role,
+            credit_balance=0.0
         )
         db.add(user)
         db.commit()
         db.refresh(user)
+    else:
+        # Sync role from SSO token if needed
+        if role and user.role != role:
+            user.role = role
+            db.commit()
+            db.refresh(user)
     return user
 
 def get_current_active_admin(current_user = Depends(get_current_user)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role != "admin" and not current_user.username.lower().startswith("admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Admin permissions required (Role 'admin' or admin username)"
+        )
     return current_user
