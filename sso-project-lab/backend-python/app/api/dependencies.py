@@ -33,7 +33,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         user = User(
             username=token_data.username,
             email=f"{token_data.username}@example.com",
-            password_hash="sso_managed",
             role=role,
             credit_balance=0.0
         )
