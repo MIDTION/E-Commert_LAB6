@@ -58,9 +58,8 @@ services:
     build: ./frontend-next
     container_name: ecom_frontend
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
-    command: npm run dev
     volumes:
       - ./frontend-next:/app
       - /app/node_modules

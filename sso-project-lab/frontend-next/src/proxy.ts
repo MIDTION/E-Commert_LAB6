@@ -7,7 +7,7 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || 'kmitl_chumphon_sso_secret_key'
 );
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = request.cookies.get('sso_token')?.value;
 
   // Protect store and inventory routes
