@@ -1,0 +1,4 @@
+﻿student66000001 Cleartext-Password := "password1234"
+admin66000001 Cleartext-Password := "password1234"
+
+DEFAULT Auth-Type := Reject
