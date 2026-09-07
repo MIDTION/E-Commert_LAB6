@@ -39,7 +39,7 @@ def update_status(
     db: Session = Depends(get_db),
     current_admin = Depends(get_current_active_admin)
 ):
-    db_order = update_order_status(db, order_id=order_id, status=status)
+    db_order = update_order_status(db, order_id=order_id, status_val=status)
     if not db_order:
         raise HTTPException(status_code=404, detail="Order not found")
     return db_order

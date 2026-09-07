@@ -25,6 +25,10 @@ def delete_product(db: Session, product_id: int):
             db.commit()
         except IntegrityError:
             db.rollback()
-            raise ValueError("Cannot delete product because it is already referenced (e.g., in an order).")
+            # Force delete: remove associated order items first to bypass foreign key constraint
+            from app.models.order import OrderItem
+            db.query(OrderItem).filter(OrderItem.product_id == product_id).delete()
+            db.delete(db_product)
+            db.commit()
     return db_product
 
