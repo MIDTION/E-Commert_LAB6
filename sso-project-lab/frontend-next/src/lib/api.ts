@@ -199,5 +199,31 @@ export const api = {
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to delete product" };
     }
+  },
+
+  /**
+   * Fetch all orders (Admin)
+   */
+  async getAllOrders(): Promise<any[]> {
+    try {
+      const data = await fetchWithAuth("/orders/all");
+      return data;
+    } catch (err) {
+      return [];
+    }
+  },
+
+  /**
+   * Update order status (Admin)
+   */
+  async updateOrderStatus(orderId: string | number, status: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      await fetchWithAuth(`/orders/${orderId}/status?status=${status}`, {
+        method: "PUT",
+      });
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Failed to update order status" };
+    }
   }
 };

@@ -17,6 +17,14 @@ def create_new_order(
 ):
     return create_order(db=db, order=order, user_id=current_user.id)
 
+@router.get("/all", response_model=List[OrderResponse])
+def read_all_orders(
+    db: Session = Depends(get_db),
+    current_admin = Depends(get_current_active_admin)
+):
+    from app.crud.order import get_all_orders
+    return get_all_orders(db=db)
+
 @router.get("/my-orders", response_model=List[OrderResponse])
 def read_my_orders(
     db: Session = Depends(get_db),

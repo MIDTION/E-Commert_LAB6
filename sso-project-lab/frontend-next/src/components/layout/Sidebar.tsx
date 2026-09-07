@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingCart, Package, LogOut, Wallet, Moon, Sun, Home, Gift, FileText, Menu, X } from 'lucide-react';
+import { Home, Package, LogOut, Wallet, Menu, X, ShoppingCart, FileText, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { mockUser } from '@/data/mockData';
 import { useTheme } from '@/components/ThemeProvider';
@@ -22,10 +22,11 @@ export default function Sidebar() {
   }, []);
 
   const navLinks = [
-    { name: 'หน้าแรก', href: '/store', icon: Home },
-    { name: 'คลังเก็บของ', href: '/inventory', icon: Package },
-    { name: 'เติม credit', href: '/topup', icon: ShoppingCart },
-    { name: 'นโยบายการคืนสินค้า', href: '/refund-policy', icon: FileText },
+    { name: 'ร้านค้า (Store)', href: '/store', icon: Home },
+    { name: 'คลังเก็บของ (Inventory)', href: '/inventory', icon: Package },
+    { name: 'เติมเงิน (Topup)', href: '/topup', icon: ShoppingCart },
+    { name: 'นโยบายการคืนเงิน (Refund Policy)', href: '/refund-policy', icon: FileText },
+    ...(user?.username?.toLowerCase().startsWith('admin') ? [{ name: 'จัดการระบบ (Admin)', href: '/admin', icon: Shield }] : []),
   ];
 
   if (!mounted) return null;

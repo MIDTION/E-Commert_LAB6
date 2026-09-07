@@ -73,3 +73,6 @@ def update_order_status(db: Session, order_id: int, status_val: str):
         db.commit()
         db.refresh(order)
     return order
+
+def get_all_orders(db: Session):
+    return db.query(Order).all()
