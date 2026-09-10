@@ -1,10 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Allow Ngrok and Localtunnel hosts in dev mode
-  devIndicators: {
-    buildActivity: true,
-  },
   // To allow any host, or specifically ngrok and loca.lt
   // Next 15+ allows array of strings. We can't use wildcard easily if it's strict, but we can try.
   // Actually, we can use `experimental` if it fails, but the warning said top level.
